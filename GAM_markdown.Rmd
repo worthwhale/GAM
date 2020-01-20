@@ -1,0 +1,63 @@
+---
+title: "GAM"
+author: "WorthWhale"
+date: "1/19/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+A markdown doc completing a GAM for the whale distribution of Dominica
+
+```{r}
+#load packages
+
+library(tidyverse)
+library(mgcv)
+library(dismo)
+library(raster)
+
+#load species file 
+spermwhales <- read_csv("physeter_macrocephalus.csv")
+
+
+#make csv spatial
+coordinates(spermwhales) <- ~long+lat
+projection(spermwhales) <- CRS('+proj=longlat +datum=WGS84')
+
+plot(spermwhales)
+
+#load environmental data: read in tiff and convert to raster
+chlorophyll_surface_mean_tif <- 'envi/chloro.tif'
+chlorophyll_surface_mean_raster <- raster(chlorophyll_surface_mean_tif)
+
+plot(chlorophyll_surface_mean_raster)
+
+
+primary_production_surface_mean_tif <- 'envi/pp.tif'
+primary_production_surface_mean_raster <- raster(primary_production_surface_mean_tif)
+
+plot(primary_production_surface_mean_raster)
+
+
+salinity_mean_tif <- 'envi/sal.tif'
+salinity_mean_raster <- raster(salinity_mean_tif)
+
+plot(salinity_mean_raster)
+
+temp_min_tif <- 'envi/temp.tif'
+temp_min_raster <- raster(temp_min_tif)
+
+plot(temp_min_raster)
+
+#stack rasters into one df
+files <- list.files(path = "envi", pattern = ".tif$", full.names = T)
+environmental_layers <- stack(files) #this isn't working "Error in compareRaster(rasters) : different extent"
+
+#extract data from rasters
+values <- extract(chlorophyll_surface_mean_raster, primary_production_surface_mean_raster, salinity_mean_raster, temp_min_raster) #not working "Error in (function (classes, fdef, mtable) : unable to find an inherited method for function ‘extract’ for signature ‘"RasterLayer", "missing"’"
+
+```
+
