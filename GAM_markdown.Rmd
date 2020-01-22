@@ -18,6 +18,7 @@ library(tidyverse)
 library(mgcv)
 library(dismo)
 library(raster)
+library(voxel)
 
 #load species file 
 spermwhales <- read_csv("physeter_macrocephalus.csv")
@@ -58,6 +59,22 @@ environmental_layers <- stack(files) #this isn't working "Error in compareRaster
 
 #extract data from rasters
 values <- extract(chlorophyll_surface_mean_raster, primary_production_surface_mean_raster, salinity_mean_raster, temp_min_raster) #not working "Error in (function (classes, fdef, mtable) : unable to find an inherited method for function ‘extract’ for signature ‘"RasterLayer", "missing"’"
+
+```
+
+
+GAM with just species and year
+```{r}
+
+clusters_2005 <- read_csv("2005_2015_cluster.csv")
+
+cluster_gam <- gam(Total ~s(Year, k = 3), data = clusters_2005)
+
+cluster_gam
+
+plotGAM(gamFit = cluster_gam, smooth.cov = "Year",  groupCovs = NULL,
+                  rawOrFitted = "raw", plotCI=TRUE, orderedAsFactor = FALSE)
+
 
 ```
 
